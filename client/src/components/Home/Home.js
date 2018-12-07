@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 import {
   HomeWrapper,
@@ -19,8 +20,12 @@ export default class Home extends Component {
           </StyledP>
         </div>
         <ButtonWrapper>
-          <StyledButton>Sign Up</StyledButton>
-          <StyledButton>Log In</StyledButton>
+          <Link to='/signup'>
+              <StyledButton>Sign Up</StyledButton>
+          </Link>
+          <Link to='/login'>
+              <StyledButton>Log In</StyledButton>
+          </Link>
         </ButtonWrapper>
       </HomeWrapper>
     );

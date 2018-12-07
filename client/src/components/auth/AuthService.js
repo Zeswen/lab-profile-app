@@ -6,7 +6,7 @@ export default class AuthService extends Component {
         super();
 
         let service = axios.create({
-            baseURL: 'http://localhost:500/api',
+            baseURL: 'http://localhost:5000/api',
             withCredentials: true
         })
         this.service = service;
@@ -33,12 +33,12 @@ export default class AuthService extends Component {
     }
 
     logout = () => {
-        return this.service.get('/auth/signup')
+        return this.service.get('/auth/logout')
             .then(res => res.data);
     }
 
     loggedin = () => {
-        return this.service.get('/auth/signup')
+        return this.service.get('/auth/loggedin')
             .then(res => res.data);
     }
 }
