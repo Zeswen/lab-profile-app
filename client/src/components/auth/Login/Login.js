@@ -30,7 +30,7 @@ export default class Login extends Component {
 
   handleFormSubmit = e => {
     e.preventDefault();
-    const { username, password} = this.state;
+    const { username, password } = this.state;
 
     this.service
       .login(username, password)
@@ -74,7 +74,10 @@ export default class Login extends Component {
             value={this.state.password}
             onChange={e => this.handleChange(e)}
           />
-          <StyledP>If you don't have an account yet, you can create your account <Link to="/signup">here</Link></StyledP>
+          <StyledP>
+            If you don't have an account yet, you can create your account{" "}
+            <Link to="/signup">here</Link>
+          </StyledP>
         </FormWrapper>
         <InfoWrapper>
           <div>
