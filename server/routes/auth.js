@@ -2,15 +2,19 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 const User = require("../models/User");
+const parser = require("../config/cloudinary")
 
 // Bcrypt to encrypt passwords
 const bcrypt = require("bcrypt");
-const bcryptSalt = 10;
+const bcryptSalt = 5;
 
-router.post("/signup", (req, res, next) => {
-  const { username, password } = req.body;
-  if (username === "" || password === "") {
-    res.status(400).json({ message: "Indicate username and password" });
+router.post("/signup", (req, res) => {
+  console.log(req.body)
+  const { username, password, campus, course } = req.body;
+  if (username === "" || password === "" || campus === "" || course === "") {
+    res
+      .status(400)
+      .json({ message: "Indicate username, password, campus and course" });
     return;
   }
 
@@ -20,46 +24,45 @@ router.post("/signup", (req, res, next) => {
       return;
     }
 
-    const salt = bcrypt.genSaltSync(bcryptSalt);
-    const hashPass = bcrypt.hashSync(password, salt);
+    console.log(password)
+
+    const hashPass = bcrypt.hashSync(password, bcrypt.genSaltSync(bcryptSalt));
 
     const newUser = new User({
       username,
-      password: hashPass
+      password: hashPass,
+      campus,
+      course
     });
 
     newUser
       .save()
-      .then(() => {
+      .then(user => {
+        req.login(user);
         res.status(200).json(newUser);
       })
-      .catch(err => {
+      .catch(() => {
         res.json({ message: "Something went wrong" });
       });
   });
 });
 
-router.post("/login", (req, res) => {
-  passport.authenticate("local", (err, theUser, failureDetails) => {
-    if (err) {
-      res
-        .status(500)
-        .json({ message: "Something went wrong authenticating user" });
-      return;
-    }
+router.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) { return next(err); }
+    if (!user) { return res.json({message: "Error on login"}); }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      return res.json(user);
+    });
+  })(req, res, next);
+});
 
-    if (!theUser) {
-      res.status(401).json(failureDetails);
-      return;
-    }
-
-    // save user in session
-    req.login(theUser, err => {
-      if (err) {
-        res.status(500).json({ message: "Session save went bad." });
-        return;
-      }
-      res.status(200).json(theUser);
+router.post("/upload", parser.single("picture"), (req, res) => {
+  User.findByIdAndUpdate(req.user.id, { image: req.file.url }).then(() => {
+    res.json({
+      success: true,
+      pictureUrl: req.file.url
     });
   });
 });
